@@ -44,7 +44,7 @@ app.get("/api/user/tasks/:idUser", async (req, res) => {
 
     } catch (error){
         res.status(500).json({
-            message: "Internal server error creating new user in database"
+            message: "Internal server error getting all the tasks from a specific user"
         })
     }
 })
@@ -74,7 +74,31 @@ app.get("/api/user/task", async (req, res) => {
 
     } catch (error){
         res.status(500).json({
-            message: "Internal server error creating new user in database"
+            message: "Internal server error getting a task from a specific user"
+        })
+    }
+})
+
+
+app.post("/api/user/addTask", async (req, res) => {
+    try{
+        const {nameTask, idUser} = req.body
+        if(!nameTask || !idUser || isNaN(Number(idUser))){
+            return res.status(400).json({
+                message: "Error in the request. The task and user ID must be valid"
+            })
+        }
+
+        const sqlQuery = `INSERT INTO tasks (nameTask, idUser) VALUES (?, ?)`
+        const [result] = await connection.query(sqlQuery, [nameTask, idUser])
+        
+        res.status(201).json({
+            message: `The task with ID: ${result.insertId} was created successfully`
+        })
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error creating new task by a specific user"
         })
     }
 })
