@@ -127,6 +127,40 @@ app.delete("/api/user/removeTask/:idTask", async (req, res) => {
     }
 })
 
+app.put("/api/user/completeTask/:idTask", async (req, res) => {
+    try{
+        const {idTask} = req.params
+        if(!idTask || isNaN(Number(idTask))){
+            return res.status(400).json({
+                message: "Error in the request. The task ID must be valid"
+            })
+        }
+        
+        const sqlQuery = `UPDATE tasks SET status = 1 WHERE idTask = ?`
+        const [result] = await connection.query(sqlQuery, [idTask])
+
+        if(result.affectedRows === 0){
+            return res.status(404).json({
+                message: `The task with ID: ${idTask} was not found`
+            })
+        }
+
+        if(result.changedRows === 0){
+            return res.status(200).json({
+                message: `The task with ID: ${idTask} was found but it has already been completed`
+            })
+        }
+        res.status(200).json({
+            message: `The task with ID: ${idTask} was completed successfully`,
+            payload: result
+        })
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error changing the status of a task"
+        })
+    }
+})
 
 
 
