@@ -91,7 +91,7 @@ app.post("/api/user/addTask", async (req, res) => {
 
         const sqlQuery = `INSERT INTO tasks (nameTask, idUser) VALUES (?, ?)`
         const [result] = await connection.query(sqlQuery, [nameTask, idUser])
-        
+
         res.status(201).json({
             message: `The task with ID: ${result.insertId} was created successfully`
         })
@@ -99,6 +99,30 @@ app.post("/api/user/addTask", async (req, res) => {
     } catch (error){
         res.status(500).json({
             message: "Internal server error creating new task by a specific user"
+        })
+    }
+})
+
+app.delete("/api/user/removeTask/:idTask", async (req, res) => {
+    try{
+        const {idTask} = req.params
+        if(!idTask || isNaN(Number(idTask))){
+            return res.status(400).json({
+                message: "Error in the request. The task ID must be valid"
+            })
+        }
+
+        const sqlQuery = `DELETE FROM tasks WHERE idTask = ?`
+        const [result] = await connection.query(sqlQuery, [idTask])
+
+        res.status(204).json({
+            message: `The task with ID: ${idTask} was deleted successfully`,
+            payload: result
+        })
+
+    } catch(error){
+        res.status(500).json({
+            message: "Internal server error removing a task from a specific user"
         })
     }
 })
