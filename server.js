@@ -19,27 +19,27 @@ app.get("/", (req, res) => {
 ////////////////////
 // Task Endpoints //
 
-app.get("/api/user/:id", async (req, res) => {
+app.get("/api/user/tasks/:idUser", async (req, res) => {
     try{
-        const {id} = req.params
-        if(!id || isNaN(Number(id))){
+        const {idUser} = req.params
+        if(!idUser || isNaN(Number(idUser))){
             return res.status(400).json({
                 message: "Error in the request. The user ID must be valid"
             })
         }
 
         const sqlQuery = `SELECT * FROM tasks WHERE idUser = ?`
-        const [rows] = await connection.query(sqlQuery, [id])
+        const [tasks] = await connection.query(sqlQuery, [idUser])
 
-        if(rows.length === 0){
+        if(tasks.length === 0){
             return res.status(200).json({
                 message: "There is any task available"
             })
         }
 
         res.status(200).json({
-            payload: rows,
-            message: rows.length
+            payload: tasks,
+            message: tasks.length
         })
 
     } catch (error){
@@ -48,6 +48,37 @@ app.get("/api/user/:id", async (req, res) => {
         })
     }
 })
+
+
+app.get("/api/user/task", async (req, res) => {
+    try{
+        const {idUser, idTask} = req.query
+        if(!idTask || isNaN(Number(idTask)) || !idUser || isNaN(Number(idUser))){
+            return res.status(400).json({
+                message: "Error in the request. The task and user ID must be valid"
+            })
+        }
+
+        const sqlQuery = `SELECT * FROM tasks WHERE idUser = ? AND idTask = ?`
+        const [task] = await connection.query(sqlQuery, [idUser, idTask])
+
+        if(task.length === 0){
+            return res.status(200).json({
+                message: `The task with ID: ${idTask} does not exist`
+            })
+        }
+
+        res.status(200).json({
+            payload: task
+        })
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error creating new user in database"
+        })
+    }
+})
+
 
 
 
