@@ -17,6 +17,41 @@ app.get("/", (req, res) => {
 })
 
 ////////////////////
+// Task Endpoints //
+
+app.get("/api/user/:id", async (req, res) => {
+    try{
+        const {id} = req.params
+        if(!id || isNaN(Number(id))){
+            return res.status(400).json({
+                message: "Error in the request. The user ID must be valid"
+            })
+        }
+
+        const sqlQuery = `SELECT * FROM tasks WHERE idUser = ?`
+        const [rows] = await connection.query(sqlQuery, [id])
+
+        if(rows.length === 0){
+            return res.status(200).json({
+                message: "There is any task available"
+            })
+        }
+
+        res.status(200).json({
+            payload: rows,
+            message: rows.length
+        })
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error creating new user in database"
+        })
+    }
+})
+
+
+
+////////////////////
 // User Endpoints //
 
 app.post("/api/user/register", async (req, res) => {
@@ -28,7 +63,7 @@ app.post("/api/user/register", async (req, res) => {
             })
         }
         
-        const sqlQuery = `INSERT INTO usuarios (userName, userEmail, userPassword) VALUES (?, ?, ?)`
+        const sqlQuery = `INSERT INTO users (userName, userEmail, userPassword) VALUES (?, ?, ?)`
         const [resultQuery] = await connection.query(sqlQuery, [name, email, password])
 
         res.status(201).json({
