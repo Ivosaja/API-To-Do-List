@@ -197,6 +197,42 @@ app.put("/api/user/markTaskAsIncompleted/:idTask", async(req, res) => {
     }
 })
 
+app.put("/api/user/modifyTask/:idTask", async(req, res) => {
+    try{
+        const {idTask} = req.params
+        const {nameTask} = req.body
+        if(!idTask || isNaN(Number(idTask)) || !nameTask){
+            return res.status(400).json({
+                message: "Error in the request. The task ID and Name must be valid"
+            })
+        }
+
+        const sqlQuery = 'UPDATE tasks SET nameTask = ? WHERE idTask = ?'
+        const [result] = await connection.query(sqlQuery, [nameTask, idTask])
+
+        if(result.affectedRows === 0){
+            return res.status(404).json({
+                message: `The task with ID: ${idTask} was not found`
+            })
+        }
+
+        if(result.changedRows === 0){
+            return res.status(200).json({
+                message: `The task with ID: ${idTask} was found but it has already had the same data`
+            })
+        }
+
+        res.status(200).json({
+            message: `The task with ID: ${idTask} was modified successfully`
+        })
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error modifying a task"
+        })
+    }
+})
+
 ////////////////////
 // User Endpoints //
 
