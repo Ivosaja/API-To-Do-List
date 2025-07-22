@@ -14,5 +14,5 @@ const validateId = (req, res, next) => {
 }
 
 export {
-    validateId
+    validateId // -> Route's middleware
 }

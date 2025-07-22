@@ -1,6 +1,7 @@
 import express from "express"
 import environments from "./src/api/config/environments.js"
 import { connection } from "./src/api/database/db.js"
+import { validateId } from "./src/api/middlewares/middlewares.js"
 
 const app = express()
 
@@ -19,17 +20,12 @@ app.get("/", (req, res) => {
 ////////////////////
 // Task Endpoints //
 
-app.get("/api/user/tasks/:idUser", async (req, res) => {
+app.get("/api/user/tasks/:id", validateId, async (req, res) => {
     try{
-        const {idUser} = req.params
-        if(!idUser || isNaN(Number(idUser))){
-            return res.status(400).json({
-                message: "Error in the request. The user ID must be valid"
-            })
-        }
+        const {id} = req.params
 
         const sqlQuery = `SELECT * FROM tasks WHERE idUser = ?`
-        const [tasks] = await connection.query(sqlQuery, [idUser])
+        const [tasks] = await connection.query(sqlQuery, [id])
 
         if(tasks.length === 0){
             return res.status(200).json({
@@ -103,20 +99,15 @@ app.post("/api/user/addTask", async (req, res) => {
     }
 })
 
-app.delete("/api/user/removeTask/:idTask", async (req, res) => {
+app.delete("/api/user/removeTask/:id", validateId, async (req, res) => {
     try{
-        const {idTask} = req.params
-        if(!idTask || isNaN(Number(idTask))){
-            return res.status(400).json({
-                message: "Error in the request. The task ID must be valid"
-            })
-        }
+        const {id} = req.params
 
         const sqlQuery = `DELETE FROM tasks WHERE idTask = ?`
-        const [result] = await connection.query(sqlQuery, [idTask])
+        const [result] = await connection.query(sqlQuery, [id])
 
         res.status(204).json({
-            message: `The task with ID: ${idTask} was deleted successfully`,
+            message: `The task with ID: ${id} was deleted successfully`,
             payload: result
         })
 
@@ -127,32 +118,26 @@ app.delete("/api/user/removeTask/:idTask", async (req, res) => {
     }
 })
 
-app.put("/api/user/markTaskAsCompleted/:idTask", async (req, res) => {
+app.put("/api/user/markTaskAsCompleted/:id", validateId, async (req, res) => {
     try{
-        const {idTask} = req.params
-        if(!idTask || isNaN(Number(idTask))){
-            return res.status(400).json({
-                message: "Error in the request. The task ID must be valid"
-            })
-        }
+        const {id} = req.params
         
         const sqlQuery = `UPDATE tasks SET status = 1 WHERE idTask = ?`
-        const [result] = await connection.query(sqlQuery, [idTask])
+        const [result] = await connection.query(sqlQuery, [id])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${idTask} was not found`
+                message: `The task with ID: ${id} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${idTask} was found but it has already been marked as completed`
+                message: `The task with ID: ${id} was found but it has already been marked as completed`
             })
         }
         res.status(200).json({
-            message: `The task with ID: ${idTask} was marked as completed successfully`,
-            payload: result
+            message: `The task with ID: ${id} was marked as completed successfully`,
         })
 
     } catch (error){
@@ -162,32 +147,27 @@ app.put("/api/user/markTaskAsCompleted/:idTask", async (req, res) => {
     }
 })
 
-app.put("/api/user/markTaskAsIncompleted/:idTask", async(req, res) => {
+app.put("/api/user/markTaskAsIncompleted/:id", validateId, async(req, res) => {
     try{
-        const {idTask} = req.params
-        if(!idTask || isNaN(Number(idTask))){
-            return res.status(400).json({
-                message: "Error in the request. The task ID must be valid"
-            })
-        }
+        const {id} = req.params
 
         const sqlQuery = 'UPDATE tasks SET status = 0 WHERE idTask = ?'
-        const [result] = await connection.query(sqlQuery, [idTask])
+        const [result] = await connection.query(sqlQuery, [id])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${idTask} was not found`
+                message: `The task with ID: ${id} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${idTask} was found but it has already been marked as incompleted`
+                message: `The task with ID: ${id} was found but it has already been marked as incompleted`
             })
         }
 
         res.status(200).json({
-            message: `The task with ID: ${idTask} was marked as incompleted successfully`
+            message: `The task with ID: ${id} was marked as incompleted successfully`
         })
 
     } catch(error){
@@ -197,33 +177,33 @@ app.put("/api/user/markTaskAsIncompleted/:idTask", async(req, res) => {
     }
 })
 
-app.put("/api/user/modifyTask/:idTask", async(req, res) => {
+app.put("/api/user/modifyTask/:id", validateId, async(req, res) => {
     try{
-        const {idTask} = req.params
+        const {id} = req.params
         const {nameTask} = req.body
-        if(!idTask || isNaN(Number(idTask)) || !nameTask){
+        if(!nameTask){
             return res.status(400).json({
-                message: "Error in the request. The task ID and Name must be valid"
+                message: "Error in the request. The task name must be valid"
             })
         }
 
         const sqlQuery = 'UPDATE tasks SET nameTask = ? WHERE idTask = ?'
-        const [result] = await connection.query(sqlQuery, [nameTask, idTask])
+        const [result] = await connection.query(sqlQuery, [nameTask, id])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${idTask} was not found`
+                message: `The task with ID: ${id} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${idTask} was found but it has already had the same data`
+                message: `The task with ID: ${id} was found but it has already had the same data`
             })
         }
 
         res.status(200).json({
-            message: `The task with ID: ${idTask} was modified successfully`
+            message: `The task with ID: ${id} was modified successfully`
         })
 
     } catch (error){
