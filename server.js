@@ -39,6 +39,7 @@ app.get("/api/user/tasks/:id", validateId, async (req, res) => {
         })
 
     } catch (error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error getting all the tasks from a specific user"
         })
@@ -69,6 +70,7 @@ app.get("/api/user/task", async (req, res) => {
         })
 
     } catch (error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error getting a task from a specific user"
         })
@@ -93,6 +95,7 @@ app.post("/api/user/addTask", async (req, res) => {
         })
 
     } catch (error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error creating new task by a specific user"
         })
@@ -112,6 +115,7 @@ app.delete("/api/user/removeTask/:id", validateId, async (req, res) => {
         })
 
     } catch(error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error removing a task from a specific user"
         })
@@ -141,6 +145,7 @@ app.put("/api/user/markTaskAsCompleted/:id", validateId, async (req, res) => {
         })
 
     } catch (error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error marking the status of a task as completed"
         })
@@ -171,6 +176,7 @@ app.put("/api/user/markTaskAsIncompleted/:id", validateId, async(req, res) => {
         })
 
     } catch(error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error marking the status of a task as incompleted"
         })
@@ -207,6 +213,7 @@ app.put("/api/user/modifyTask/:id", validateId, async(req, res) => {
         })
 
     } catch (error){
+        console.error(error)
         res.status(500).json({
             message: "Internal server error modifying a task"
         })
