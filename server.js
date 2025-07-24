@@ -247,6 +247,37 @@ app.post("/api/user/register", async (req, res) => {
     }
 })
 
+
+app.post("/api/user/login", async(req, res) => {
+    try{
+        const { email, password } = req.body
+        if(!email || !password){
+            return res.status(400).json({
+                message: "Error in the request. All the fields must be valid"
+            })
+        }
+
+        const sqlQuery = 'SELECT * FROM users WHERE userEmail = ? AND userPassword = ?'
+        const [result] = await connection.query(sqlQuery, [email, password])
+
+        if(result.length === 0){
+            return res.status(404).json({
+                message: "The user was not found"
+            })
+        }
+
+        res.status(200).json({
+            message: "The user has successfully logged in "
+        })
+
+
+    } catch (error){
+        res.status(500).json({
+            message: "Internal server error when the user tries to log in"
+        })
+    }
+})
+
 app.listen(PORT, () => {
     console.log(`Server running on port: http://localhost:${PORT}`)
 })
