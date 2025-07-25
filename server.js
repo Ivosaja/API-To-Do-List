@@ -49,20 +49,16 @@ app.get("/api/user/tasks", validateToken, async (req, res) => {
 })
 
 
-app.get("/api/user/task", async (req, res) => {
+app.get("/api/user/task/:id", validateToken, validateId, async (req, res) => {
     try{
-        const {idUser, idTask} = req.query
-        if(!idTask || isNaN(Number(idTask)) || !idUser || isNaN(Number(idUser))){
-            return res.status(400).json({
-                message: "Error in the request. The task and user ID must be valid"
-            })
-        }
+        const idUser = req.user.id
+        const idTask = req.params.id
 
         const sqlQuery = `SELECT * FROM tasks WHERE idUser = ? AND idTask = ?`
         const [task] = await connection.query(sqlQuery, [idUser, idTask])
 
         if(task.length === 0){
-            return res.status(200).json({
+            return res.status(404).json({
                 message: `The task with ID: ${idTask} does not exist`
             })
         }
@@ -80,10 +76,11 @@ app.get("/api/user/task", async (req, res) => {
 })
 
 
-app.post("/api/user/addTask", async (req, res) => {
+app.post("/api/user/addTask", validateToken ,async (req, res) => {
     try{
-        const {nameTask, idUser} = req.body
-        if(!nameTask || !idUser || isNaN(Number(idUser))){
+        const idUser = req.user.id
+        const {nameTask} = req.body
+        if(!nameTask){
             return res.status(400).json({
                 message: "Error in the request. The task and user ID must be valid"
             })
@@ -104,15 +101,16 @@ app.post("/api/user/addTask", async (req, res) => {
     }
 })
 
-app.delete("/api/user/removeTask/:id", validateId, async (req, res) => {
+app.delete("/api/user/removeTask/:id", validateToken, validateId, async (req, res) => {
     try{
-        const {id} = req.params
+        const idUser = req.user.id
+        const idTask = req.params.id
 
-        const sqlQuery = `DELETE FROM tasks WHERE idTask = ?`
-        const [result] = await connection.query(sqlQuery, [id])
+        const sqlQuery = `DELETE FROM tasks WHERE idUser = ? AND idTask = ?`
+        const [result] = await connection.query(sqlQuery, [idUser, idTask])
 
         res.status(204).json({
-            message: `The task with ID: ${id} was deleted successfully`,
+            message: `The task with ID: ${idTask} was deleted successfully`,
             payload: result
         })
 
@@ -124,26 +122,27 @@ app.delete("/api/user/removeTask/:id", validateId, async (req, res) => {
     }
 })
 
-app.put("/api/user/markTaskAsCompleted/:id", validateId, async (req, res) => {
+app.put("/api/user/markTaskAsCompleted/:id", validateToken, validateId, async (req, res) => {
     try{
-        const {id} = req.params
+        const idUser = req.user.id
+        const idTask = req.params.id
         
-        const sqlQuery = `UPDATE tasks SET status = 1 WHERE idTask = ?`
-        const [result] = await connection.query(sqlQuery, [id])
+        const sqlQuery = `UPDATE tasks SET status = 1 WHERE idUser = ? AND idTask = ?`
+        const [result] = await connection.query(sqlQuery, [idUser, idTask])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${id} was not found`
+                message: `The task with ID: ${idTask} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${id} was found but it has already been marked as completed`
+                message: `The task with ID: ${idTask} was found but it has already been marked as completed`
             })
         }
         res.status(200).json({
-            message: `The task with ID: ${id} was marked as completed successfully`,
+            message: `The task with ID: ${idTask} was marked as completed successfully`,
         })
 
     } catch (error){
@@ -154,27 +153,28 @@ app.put("/api/user/markTaskAsCompleted/:id", validateId, async (req, res) => {
     }
 })
 
-app.put("/api/user/markTaskAsIncompleted/:id", validateId, async(req, res) => {
+app.put("/api/user/markTaskAsIncompleted/:id", validateToken, validateId, async(req, res) => {
     try{
-        const {id} = req.params
+        const idUser = req.user.id
+        const idTask = req.params.id
 
-        const sqlQuery = 'UPDATE tasks SET status = 0 WHERE idTask = ?'
-        const [result] = await connection.query(sqlQuery, [id])
+        const sqlQuery = 'UPDATE tasks SET status = 0 WHERE idUser = ? AND idTask = ?'
+        const [result] = await connection.query(sqlQuery, [idUser, idTask])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${id} was not found`
+                message: `The task with ID: ${idTask} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${id} was found but it has already been marked as incompleted`
+                message: `The task with ID: ${idTask} was found but it has already been marked as incompleted`
             })
         }
 
         res.status(200).json({
-            message: `The task with ID: ${id} was marked as incompleted successfully`
+            message: `The task with ID: ${idTask} was marked as incompleted successfully`
         })
 
     } catch(error){
@@ -185,9 +185,10 @@ app.put("/api/user/markTaskAsIncompleted/:id", validateId, async(req, res) => {
     }
 })
 
-app.put("/api/user/modifyTask/:id", validateId, async(req, res) => {
+app.put("/api/user/modifyTask/:id", validateToken, validateId, async(req, res) => {
     try{
-        const {id} = req.params
+        const idUser = req.user.id
+        const idTask = req.params.id
         const {nameTask} = req.body
         if(!nameTask){
             return res.status(400).json({
@@ -195,23 +196,23 @@ app.put("/api/user/modifyTask/:id", validateId, async(req, res) => {
             })
         }
 
-        const sqlQuery = 'UPDATE tasks SET nameTask = ? WHERE idTask = ?'
-        const [result] = await connection.query(sqlQuery, [nameTask, id])
+        const sqlQuery = 'UPDATE tasks SET nameTask = ? WHERE idUser = ? AND idTask = ?'
+        const [result] = await connection.query(sqlQuery, [nameTask, idUser, idTask])
 
         if(result.affectedRows === 0){
             return res.status(404).json({
-                message: `The task with ID: ${id} was not found`
+                message: `The task with ID: ${idTask} was not found`
             })
         }
 
         if(result.changedRows === 0){
             return res.status(200).json({
-                message: `The task with ID: ${id} was found but it has already had the same data`
+                message: `The task with ID: ${idTask} was found but it has already had the same data`
             })
         }
 
         res.status(200).json({
-            message: `The task with ID: ${id} was modified successfully`
+            message: `The task with ID: ${idTask} was modified successfully`
         })
 
     } catch (error){
