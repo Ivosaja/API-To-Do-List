@@ -22,9 +22,9 @@ app.get("/", (req, res) => {
 ////////////////////
 // Task Endpoints //
 
-app.get("/api/user/tasks/:id", validateId, async (req, res) => {
+app.get("/api/user/tasks", validateToken, async (req, res) => {
     try{
-        const {id} = req.params
+        const {id} = req.user
 
         const sqlQuery = `SELECT * FROM tasks WHERE idUser = ?`
         const [tasks] = await connection.query(sqlQuery, [id])
