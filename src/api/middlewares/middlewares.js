@@ -19,6 +19,7 @@ const validateId = (req, res, next) => {
 }
 
 const validateToken = (req, res, next) => {
+    // Authorization: Bearer token//
     const authHeader = req.headers.authorization
     if(!authHeader){
         return res.status(401).json({
