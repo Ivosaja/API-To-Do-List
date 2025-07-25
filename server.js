@@ -2,10 +2,12 @@ import express from "express"
 import environments from "./src/api/config/environments.js"
 import { connection } from "./src/api/database/db.js"
 import { validateId } from "./src/api/middlewares/middlewares.js"
+import jwt from "jsonwebtoken"
 
 const app = express()
 
 const PORT = environments.port
+const SECRET = environments.secret
 
 ////////////////
 // Middlewares//
@@ -265,6 +267,9 @@ app.post("/api/user/login", async(req, res) => {
                 message: "The user was not found"
             })
         }
+
+        // Getting only the first result of the select (the user)
+        const user =  result[0]
 
         res.status(200).json({
             message: "The user has successfully logged in "
