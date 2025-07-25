@@ -271,8 +271,12 @@ app.post("/api/user/login", async(req, res) => {
         // Getting only the first result of the select (the user)
         const user =  result[0]
 
+        // Creating the JWT token (signing it)
+        const token = jwt.sign({id: user.idUser}, SECRET, {expiresIn: '1h'})
+
         res.status(200).json({
-            message: "The user has successfully logged in "
+            message: "The user has successfully logged in ",
+            token: token
         })
 
 
