@@ -272,8 +272,8 @@ app.post("/api/user/login", async(req, res) => {
             })
         }
 
-        const sqlQuery = 'SELECT * FROM users WHERE userEmail = ? AND userPassword = ?'
-        const [result] = await connection.query(sqlQuery, [email, password])
+        const sqlQuery = 'SELECT * FROM users WHERE userEmail = ?'
+        const [result] = await connection.query(sqlQuery, [email])
 
         if(result.length === 0){
             return res.status(404).json({
@@ -283,6 +283,13 @@ app.post("/api/user/login", async(req, res) => {
 
         // Getting only the first result of the select (the user)
         const user =  result[0]
+
+        const passwordCompared = await bcrypt.compare(password, user.userPassword)
+        if(!passwordCompared){
+            return res.status(400).json({
+                message: "The password is invalid"
+            })
+        }
 
         // Creating the JWT token (signing it)
         const token = jwt.sign({id: user.idUser}, SECRET, {expiresIn: '1h'})
