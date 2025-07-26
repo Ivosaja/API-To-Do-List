@@ -3,6 +3,7 @@ import environments from "./src/api/config/environments.js"
 import { connection } from "./src/api/database/db.js"
 import { validateId, validateToken } from "./src/api/middlewares/middlewares.js"
 import jwt from "jsonwebtoken"
+import bcrypt, { hash } from "bcrypt"
 
 const app = express()
 
@@ -244,8 +245,10 @@ app.post("/api/user/register", async (req, res) => {
             })
         }
 
+        const passwordHashed = await bcrypt.hash(password, 10)
+
         const sqlQuery = `INSERT INTO users (userName, userEmail, userPassword) VALUES (?, ?, ?)`
-        const [resultQuery] = await connection.query(sqlQuery, [name, email, password])
+        const [resultQuery] = await connection.query(sqlQuery, [name, email, passwordHashed])
 
         res.status(201).json({
             message: `Creation successfully! The user with ID: ${resultQuery.insertId} was created successfully`
