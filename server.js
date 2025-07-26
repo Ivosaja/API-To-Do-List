@@ -234,7 +234,16 @@ app.post("/api/user/register", async (req, res) => {
                 message: "Error in the request. All fields must be valid"
             })
         }
-        
+
+        const sqlQueryCheck = 'SELECT * FROM users WHERE userEmail = ?'
+        const [resultQueryCheck] = await connection.query(sqlQueryCheck, [email])
+
+        if(resultQueryCheck.length > 0){
+            return res.status(409).json({
+                message: "The email already exists. Try with another"
+            })
+        }
+
         const sqlQuery = `INSERT INTO users (userName, userEmail, userPassword) VALUES (?, ?, ?)`
         const [resultQuery] = await connection.query(sqlQuery, [name, email, password])
 
