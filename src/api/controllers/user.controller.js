@@ -1,7 +1,7 @@
 import { getUserByEmail, createNewUser} from "../models/user.model.js"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-import environments from "../config/environments"
+import environments from "../config/environments.js"
 
 const SECRET = environments.secret
 
