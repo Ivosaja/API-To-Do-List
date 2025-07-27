@@ -4,6 +4,7 @@ import { connection } from "./src/api/database/db.js"
 import { validateId, validateToken } from "./src/api/middlewares/middlewares.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import { userRoutes } from "./src/api/routes/index.js"
 
 const app = express()
 
@@ -226,6 +227,8 @@ app.put("/api/user/modifyTask/:id", validateToken, validateId, async(req, res) =
 
 ////////////////////
 // User Endpoints //
+
+app.use("/api/user", userRoutes)
 
 app.post("/api/user/register", async (req, res) => {
     try{
