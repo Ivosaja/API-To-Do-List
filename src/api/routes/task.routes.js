@@ -2,7 +2,7 @@ import {Router} from "express"
 
 const router = Router()
 
-router.get("/tasks", getAllTasks)
+router.get("/", getAllTasks)
 
 router.get("/task/:id", getTaskById)
 
