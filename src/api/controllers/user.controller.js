@@ -1,4 +1,9 @@
 import { getUserByEmail, createNewUser} from "../models/user.model.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import environments from "../config/environments"
+
+const SECRET = environments.secret
 
 export const registerUser = async (req, res) => {
     try{
@@ -9,8 +14,7 @@ export const registerUser = async (req, res) => {
             })
         }
 
-        const sqlQueryCheck = 'SELECT * FROM users WHERE userEmail = ?'
-        const [resultQueryCheck] = await connection.query(sqlQueryCheck, [email])
+        const [resultQueryCheck] = await getUserByEmail(email)
 
         if(resultQueryCheck.length > 0){
             return res.status(409).json({
@@ -20,8 +24,7 @@ export const registerUser = async (req, res) => {
 
         const passwordHashed = await bcrypt.hash(password, 10)
 
-        const sqlQuery = `INSERT INTO users (userName, userEmail, userPassword) VALUES (?, ?, ?)`
-        const [resultQuery] = await connection.query(sqlQuery, [name, email, passwordHashed])
+        const [resultQuery] = await createNewUser(name, email, passwordHashed)
 
         res.status(201).json({
             message: `Creation successfully! The user with ID: ${resultQuery.insertId} was created successfully`
@@ -45,8 +48,7 @@ export const loginUser = async(req, res) => {
             })
         }
 
-        const sqlQuery = 'SELECT * FROM users WHERE userEmail = ?'
-        const [result] = await connection.query(sqlQuery, [email])
+        const [result] = await getUserByEmail(email)
 
         if(result.length === 0){
             return res.status(404).json({
