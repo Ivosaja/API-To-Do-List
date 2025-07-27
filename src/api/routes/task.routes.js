@@ -6,7 +6,7 @@ const router = Router()
 
 router.get("/", validateToken, getAllTasks)
 
-router.get("/task/:id", validateToken, validateId, getTaskById)
+router.get("/:id", validateToken, validateId, getTaskById)
 
 router.post("/addTask", validateToken, createTask)
 
