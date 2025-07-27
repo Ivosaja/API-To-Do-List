@@ -1,9 +1,10 @@
+import { insertTask, removeTask, selectAllTasks, selectTaskById, updateNameTask, updateTaskStatusToFalse, updateTaskStatusToTrue } from "../models/task.model.js"
+
 export const getAllTasks = async (req, res) => {
     try{
         const {id} = req.user
 
-        const sqlQuery = `SELECT * FROM tasks WHERE idUser = ?`
-        const [tasks] = await connection.query(sqlQuery, [id])
+        const [tasks] = await selectAllTasks(id)
 
         if(tasks.length === 0){
             return res.status(200).json({
@@ -29,8 +30,7 @@ export const getTaskById = async (req, res) => {
         const idUser = req.user.id
         const idTask = req.params.id
 
-        const sqlQuery = `SELECT * FROM tasks WHERE idUser = ? AND idTask = ?`
-        const [task] = await connection.query(sqlQuery, [idUser, idTask])
+        const [task] = await selectTaskById(idUser, idTask)
 
         if(task.length === 0){
             return res.status(404).json({
@@ -60,8 +60,7 @@ export const createTask = async (req, res) => {
             })
         }
 
-        const sqlQuery = `INSERT INTO tasks (nameTask, idUser) VALUES (?, ?)`
-        const [result] = await connection.query(sqlQuery, [nameTask, idUser])
+        const [result] = await insertTask(nameTask, idUser)
 
         res.status(201).json({
             message: `The task with ID: ${result.insertId} was created successfully`
@@ -80,8 +79,7 @@ export const deleteTask = async (req, res) => {
         const idUser = req.user.id
         const idTask = req.params.id
 
-        const sqlQuery = `DELETE FROM tasks WHERE idUser = ? AND idTask = ?`
-        const [result] = await connection.query(sqlQuery, [idUser, idTask])
+        const [result] = await removeTask(idUser, idTask)
 
         res.status(204).json({
             message: `The task with ID: ${idTask} was deleted successfully`,
@@ -101,8 +99,7 @@ export const markTaskAsCompleted = async (req, res) => {
         const idUser = req.user.id
         const idTask = req.params.id
         
-        const sqlQuery = `UPDATE tasks SET status = 1 WHERE idUser = ? AND idTask = ?`
-        const [result] = await connection.query(sqlQuery, [idUser, idTask])
+        const [result] = await updateTaskStatusToTrue(idUser, idTask)
 
         if(result.affectedRows === 0){
             return res.status(404).json({
@@ -132,8 +129,7 @@ export const markTaskAsIncompleted = async(req, res) => {
         const idUser = req.user.id
         const idTask = req.params.id
 
-        const sqlQuery = 'UPDATE tasks SET status = 0 WHERE idUser = ? AND idTask = ?'
-        const [result] = await connection.query(sqlQuery, [idUser, idTask])
+        const [result] = await updateTaskStatusToFalse(idUser, idTask)
 
         if(result.affectedRows === 0){
             return res.status(404).json({
@@ -170,8 +166,7 @@ export const modifyTask = async(req, res) => {
             })
         }
 
-        const sqlQuery = 'UPDATE tasks SET nameTask = ? WHERE idUser = ? AND idTask = ?'
-        const [result] = await connection.query(sqlQuery, [nameTask, idUser, idTask])
+        const [result] = await updateNameTask(nameTask, idUser, idTask)
 
         if(result.affectedRows === 0){
             return res.status(404).json({
