@@ -81,6 +81,12 @@ export const deleteTask = async (req, res) => {
 
         const [result] = await removeTask(idUser, idTask)
 
+        if(result.affectedRows === 0){
+            return res.status(404).json({
+                message: `The task with ID: ${idTask} was not found`
+            })
+        }
+
         res.status(204).json({
             message: `The task with ID: ${idTask} was deleted successfully`,
             payload: result
