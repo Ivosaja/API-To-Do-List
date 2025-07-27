@@ -2,14 +2,11 @@ import express from "express"
 import environments from "./src/api/config/environments.js"
 import { connection } from "./src/api/database/db.js"
 import { validateId, validateToken } from "./src/api/middlewares/middlewares.js"
-import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt"
 import { userRoutes } from "./src/api/routes/index.js"
 
 const app = express()
 
 const PORT = environments.port
-const SECRET = environments.secret
 
 ////////////////
 // Middlewares//
