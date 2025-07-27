@@ -1,19 +1,21 @@
 import {Router} from "express"
+import { createTask, deleteTask, getAllTasks, getTaskById, markTaskAsCompleted, markTaskAsIncompleted, modifyTask } from "../controllers/task.controller.js"
+import { validateId, validateToken } from "../middlewares/middlewares.js"
 
 const router = Router()
 
-router.get("/", getAllTasks)
+router.get("/", validateToken, getAllTasks)
 
-router.get("/task/:id", getTaskById)
+router.get("/task/:id", validateToken, validateId, getTaskById)
 
-router.post("/addTask", createTask)
+router.post("/addTask", validateToken, createTask)
 
-router.delete("/removeTask/:id", deleteTask)
+router.delete("/removeTask/:id", validateToken, validateId, deleteTask)
 
-router.put("/markTaskAsCompleted/:id", markTaskAsCompleted)
+router.put("/markTaskAsCompleted/:id", validateToken, validateId, markTaskAsCompleted)
 
-router.put("/markTaskAsIncompleted/:id", markTaskAsIncompleted)
+router.put("/markTaskAsIncompleted/:id", validateToken, validateId, markTaskAsIncompleted)
 
-router.put("/modifyTask/:id", updateTask)
+router.put("/modifyTask/:id", validateToken, validateId, modifyTask)
 
 export default router
