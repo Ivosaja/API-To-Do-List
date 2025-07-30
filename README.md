@@ -15,3 +15,44 @@ This is a full-featured RESTful API for a To-Do List application. Built with **N
 - Clean and modular codebase
 
 ---
+
+## 📁 Folder Structure
+
+```bash
+├── package.json
+├── package-lock.json
+├── README.md
+├── server.js
+└── src
+    └── api
+        ├── config
+        │   └── environments.js
+        ├── controllers
+        │   ├── task.controller.js
+        │   └── user.controller.js
+        ├── database
+        │   └── db.js
+        ├── middlewares
+        │   └── middlewares.js
+        ├── models
+        │   ├── task.model.js
+        │   └── user.model.js
+        └── routes
+            ├── index.js
+            ├── task.routes.js
+            └── user.routes.js
+
+```
+
+---
+
+## 📦 Tech Stack
+
+- **Node.js**
+- **Express**
+- **MySQL**
+- **bcrypt**
+- **jsonwebtoken**
+- **dotenv**
+
+---
