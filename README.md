@@ -136,6 +136,4 @@ CREATE TABLE tasks (
 
 ---
 
-## 👤 Author
-
-**Ivo Lionel Saja**
+*Made with ❤️ by [Ivosaja](https://github.com/Ivosaja)*
