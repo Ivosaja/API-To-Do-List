@@ -77,3 +77,65 @@ This is a full-featured RESTful API for a To-Do List application. Built with **N
 | PUT    | `/api/user/tasks/modifyTask/:id`      | Update task name           |
 
 ---
+
+## 🔧 How to Run Locally
+
+1. Clone this repository
+2. Run `npm install`
+3. Set up a MySQL database and import schema (see this later)
+4. Create a `.env` file with:
+    - PORT=theportyouwant
+    - SECRET=your_jwt_secret
+    - DB_HOST=nameofhost
+    - DB_NAME=nameofdatabase
+    - DB_USER=youruser
+    - DB_PASSWORD=yourdbpassword
+
+5. Run with `npm run dev`
+6. Use Postman to test the endpoints
+
+---
+
+## 🧱 Database Setup (Manual Instructions)
+
+To test the app, you have to create the database and tables manually.
+
+### 🔧 Steps:
+
+1. Open MySQL (Workbench or terminal)
+2. Create the database (use the name you configured in `.env`):
+
+```sql
+CREATE DATABASE your_database_name;
+USE your_database_name;
+```
+3. Create the tables:
+
+```sql
+CREATE TABLE users (
+  idUser INT AUTO_INCREMENT PRIMARY KEY,
+  userName VARCHAR(16) NOT NULL,
+  userEmail VARCHAR(255) NOT NULL,
+  userPassword VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE tasks (
+  idTask INT AUTO_INCREMENT PRIMARY KEY,
+  nameTask VARCHAR(150) NOT NULL,
+  idUser INT NOT NULL,
+  status TINYINT(1) DEFAULT 0,
+  FOREIGN KEY (idUser) REFERENCES users(idUser) ON DELETE CASCADE
+);
+```
+--- 
+
+## 🔐 Authorization
+
+- All `/api/user/*` task routes require an Authorization header on Postman:
+    - Authorization: Bearer <your_token>
+
+---
+
+## 👤 Author
+
+**Ivo Lionel Saja**
