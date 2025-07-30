@@ -19,9 +19,6 @@ This is a full-featured RESTful API for a To-Do List application. Built with **N
 ## 📁 Folder Structure
 
 ```bash
-├── package.json
-├── package-lock.json
-├── README.md
 ├── server.js
 └── src
     └── api
@@ -54,5 +51,29 @@ This is a full-featured RESTful API for a To-Do List application. Built with **N
 - **bcrypt**
 - **jsonwebtoken**
 - **dotenv**
+- **nodemon**
+
+---
+
+## 📌 Endpoints Overview
+
+### 🔐 Auth
+
+| Method | Endpoint           | Description       |
+|--------|--------------------|-------------------|
+| POST   | `/api/user/register` | Register a new user |
+| POST   | `/api/user/login`    | Login and get token  |
+
+### 📋 Tasks (Protected routes - require JWT)
+
+| Method | Endpoint                        | Description                |
+|--------|----------------------------------|----------------------------|
+| GET    | `/api/user/tasks/`               | Get all tasks for user     |
+| GET    | `/api/user/tasks/:id`            | Get specific task by ID    |
+| POST   | `/api/user/tasks/addTask`             | Create new task            |
+| DELETE | `/api/user/tasks/removeTask/:id`      | Delete a task              |
+| PUT    | `/api/user/tasks/markTaskAsCompleted/:id` | Mark task as done      |
+| PUT    | `/api/user/tasks/markTaskAsIncompleted/:id` | Mark task as not done |
+| PUT    | `/api/user/tasks/modifyTask/:id`      | Update task name           |
 
 ---
